@@ -296,11 +296,13 @@
     const validation = sortAndValidatePoints(pointsInput);
     if (!validation.ok) return {ok:false, error:validation.error, plan:[]};
     const points = validation.points;
-    const totalM = Number(totalLengthM);
+    const requestedTotal = Number(totalLengthM);
+    const measuredEndM = points[points.length - 1].x;
+    const totalM = Number.isFinite(requestedTotal) && requestedTotal > 0 ? Math.min(requestedTotal, measuredEndM) : measuredEndM;
     const startM = Math.max(0, Number(options.startM) || 0);
     const kerfM = Math.max(0, Number(options.kerfMm) || 0) / 1000;
     const objective = options.objective === 'count' ? 'count' : 'value';
-    if (!Number.isFinite(totalM) || totalM < 2.9) return {ok:false,error:'Stammen måste vara minst 2,90 m för att kunna ge massaved.',plan:[]};
+    if (!Number.isFinite(totalM) || totalM < 2.9) return {ok:false,error:'Sista kompletta mätpunkten måste ligga minst 2,90 m från rotskäret.',plan:[]};
     if (startM >= totalM) return {ok:false,error:'Startpunkten ligger efter stammens slut.',plan:[]};
 
     const totalMm = Math.round(totalM * 1000);

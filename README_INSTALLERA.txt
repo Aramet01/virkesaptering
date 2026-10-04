@@ -1,5 +1,5 @@
 VIRKESAPTERING – PWA FÖR IPHONE
-Version 2.3
+Version 2.4
 
 Vad paketet innehåller
 ----------------------
@@ -36,9 +36,9 @@ Installera på iPhone
 Användning
 ----------
 1. Välj tall eller gran och kvalitetsklass.
-2. Ange hela stammens längd.
-3. Skapa mätpunkter var 1 m eller 2 m, eller lägg in egna.
-4. Klava diametern UTANPÅ BARK vid mätpunkterna och fyll i cm, till exempel 32,4 cm.
+2. Börja mäta från rotskäret och fyll i diameter UTANPÅ BARK i cm, till exempel 32,4 cm.
+3. Lägg till nästa mätpunkt med “+ 1 m”, “+ 2 m” eller “+ Valfri punkt”.
+4. Fortsätt upp längs trädet. Den SISTA KOMPLETTA MÄTPUNKTEN blir automatiskt trädets mätta stamlängd. Ingen separat totallängd anges.
 5. Välj massavedskvalitet (prima/sekunda) och ange transportavståndet i km till mottagande industri om du vill räkna transportavdrag.
 6. Tryck "Aptera hela stammen".
 7. Appen visar timmer och massaved separat, med längder, kapmått, volym och uppskattat värde.
@@ -47,7 +47,7 @@ Användning
 10. "Exportera CSV" skapar en Excel-vänlig semikolonseparerad fil med både stamsummering och varje apterad bit.
 11. "Avsluta avverkning" låser den valda avverkningen. Använd "+ Ny avverkning" för nästa objekt/dag.
 
-Mät- och prisregler i version 2.3
+Mät- och prisregler i version 2.4
 ---------------------------------
 - Prislista: Norra Skog NS46-01, giltig från 2026-04-20 för bland annat Vindeln.
 - Tillåtna prislistelängder: 340, 370, 400, 430, 460, 490, 520 och 550 cm.
@@ -101,7 +101,7 @@ Skogforsk, Björn Hannrup (2004): Funktioner för skattning av barkens tjocklek 
 https://www.skogforsk.se/kunskapsbanken/kunskapsartiklar/2004/funktioner-for-skattning-av-barkens-tjocklek-hos-tall-och-gran-vid-avverkning-med-skordare/
 
 
-Avverkningssammanställning – version 2.3
+Avverkningssammanställning – version 2.4
 ----------------------------------------
 - Flera stammar kan sparas i samma avverkning.
 - Appen summerar tall/gran, timmerstockar, massavedsbitar, underdimension, volym och uppskattat värde.
@@ -111,10 +111,13 @@ Avverkningssammanställning – version 2.3
 - All avverkningsdata sparas lokalt i webbläsarens lagring på enheten. Rensa inte webbplatsdata om historiken ska bevaras.
 
 
-Nytt i version 2.3
+Nytt i version 2.4
 -------------------
-- Stamlängd anges separat för varje träd.
-- Efter ”Spara & nästa stam” töms stamlängden och mätprofilen så att nästa träd måste få sin egen längd.
+- Den separata rutan för total/stamlängd är borttagen.
+- Trädets mätta stamlängd tas automatiskt från den sista kompletta mätpunkten.
+- Appen apterar aldrig längre än den sista kompletta mätpunkten.
+- Knapparna “+ 1 m” och “+ 2 m” gör det snabbt att fortsätta mäta upp längs stammen; valfri mätpunkt kan också läggas till.
+- Efter “Spara & nästa stam” startas en ny tom mätprofil.
 - Diameter matas in i centimeter på bark (t.ex. 32,4 cm), inte millimeter.
 - Appen räknar internt om cm till mm eftersom Norra Skogs prislista och barkfunktionerna använder mm.
 - Visade toppdiametrar och CSV-export anges i cm.

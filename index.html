@@ -36,10 +36,6 @@
         <label>Timmerkvalitet
           <select id="quality"></select>
         </label>
-        <label>Stamlängd för detta träd (m)
-          <input id="stemLength" type="number" inputmode="decimal" min="2.9" max="40" step="0.1" value="" placeholder="t.ex. 18,5">
-          <small class="field-help">Ange längden för varje träd separat, till den punkt där du vill att appen ska sluta aptera. Fältet töms efter “Spara & nästa stam”.</small>
-        </label>
         <label>Optimera för
           <select id="objective">
             <option value="value">Högsta uppskattade totalvärde</option>
@@ -120,21 +116,21 @@
       <div class="section-head">
         <div>
           <h2>Mätpunkter</h2>
-          <p>Avstånd från rotskäret och diameter <strong>utanpå bark i cm</strong>.</p>
+          <p>Avstånd från rotskäret och diameter <strong>utanpå bark i cm</strong>. Den sista ifyllda mätpunkten blir trädets mätta stamlängd.</p>
         </div>
         <span id="pointCount" class="mini-pill">0 punkter</span>
       </div>
 
       <div class="toolbar">
-        <button class="secondary" id="grid1" type="button">Var 1 m</button>
-        <button class="secondary" id="grid2" type="button">Var 2 m</button>
-        <button class="secondary" id="addPoint" type="button">+ Punkt</button>
+        <button class="secondary" id="next1" type="button">+ 1 m</button>
+        <button class="secondary" id="next2" type="button">+ 2 m</button>
+        <button class="secondary" id="addPoint" type="button">+ Valfri punkt</button>
         <button class="ghost" id="clearDiameters" type="button">Töm diametrar</button>
       </div>
 
       <div class="measure-head" aria-hidden="true"><span>Avstånd (m)</span><span>Ø på bark (cm)</span><span></span></div>
       <div id="points" class="measure-list"></div>
-      <p id="measureHint" class="hint">Fyll i minst tre diametrar. Ju fler punkter, desto säkrare stamprofil.</p>
+      <p id="measureHint" class="hint">Fyll i minst tre diametrar. Appen använder den sista kompletta mätpunkten som trädets stamlängd och apterar aldrig längre än dit.</p>
     </section>
 
     <section class="card action-card">
@@ -198,7 +194,7 @@
       </div>
       <div class="table-wrap">
         <table class="harvest-table">
-          <thead><tr><th>Stam</th><th>Träslag</th><th>Stamlängd</th><th>Timmer</th><th>Massaved</th><th>Volym*</th><th>Värde*</th><th>Sparad</th><th></th></tr></thead>
+          <thead><tr><th>Stam</th><th>Träslag</th><th>Mätt längd</th><th>Timmer</th><th>Massaved</th><th>Volym*</th><th>Värde*</th><th>Sparad</th><th></th></tr></thead>
           <tbody id="harvestRows"></tbody>
         </table>
       </div>
@@ -216,6 +212,7 @@
         <li>Massavedens baspris är 410 kr/m³fub prima och 360 kr/m³fub sekunda. Transportavdrag räknas som 0,35 kr/m³fub per km, högst 80 kr/m³fub.</li>
         <li>Tall och gran får enligt prislistan samsorteras i barrmassaved. Appen håller ändå reda på valt träslag för barkberäkningen.</li>
         <li>Barkavdrag skattas med Skogforsks barkfunktioner för tall och gran.</li>
+        <li>Trädets mätta stamlängd tas automatiskt från den sista kompletta mätpunkten. Ingen separat totallängd anges.</li>
         <li>Krök, röta, kvist, sprötkvist, skador och andra kvalitetsfel kan inte avgöras från diametermätning och bedöms därför inte automatiskt.</li>
       </ul>
     </section>
@@ -226,7 +223,7 @@
     </section>
 
     <footer>
-      <span>Virkesaptering v2.3 · NS46-01</span>
+      <span>Virkesaptering v2.4 · NS46-01</span>
       <button id="resetAll" type="button" class="link-button">Nollställ all lokal data</button>
     </footer>
   </main>

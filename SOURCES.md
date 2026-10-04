@@ -1,4 +1,4 @@
-# Källor och implementerade regler – version 2.3
+# Källor och implementerade regler – version 2.4
 
 ## Norra Skog NS46-01
 
@@ -64,14 +64,14 @@ Biometria beskriver m³fub som stocks fastvolym under bark och stockmätning av 
 
 ## Viktig avgränsning
 
-Appen är inte ett ersättningsgrundande mätsystem. Den ger en fältuppskattning och en apteringsrekommendation utifrån inmatad stamprofil, valda kvalitetsklasser och prislistan. Version 2.3 jämför dimensionellt möjlig timmeraptering med barrmassaved och räknar transportavdrag från användarens angivna transportavstånd enligt 0,35 kr/m³fub och km, max 80 kr/m³fub. Kvalitetsfel som röta, krök, kvistfel eller nedsmutsning kan inte avgöras från klavmåtten och klassificeras därför inte automatiskt.
+Appen är inte ett ersättningsgrundande mätsystem. Den ger en fältuppskattning och en apteringsrekommendation utifrån inmatad stamprofil, valda kvalitetsklasser och prislistan. Version 2.4 jämför dimensionellt möjlig timmeraptering med barrmassaved och räknar transportavdrag från användarens angivna transportavstånd enligt 0,35 kr/m³fub och km, max 80 kr/m³fub. Kvalitetsfel som röta, krök, kvistfel eller nedsmutsning kan inte avgöras från klavmåtten och klassificeras därför inte automatiskt.
 
 
-## Nytt i version 2.3
+## Nytt i version 2.4
 
-Version 2.3 ändrar inte pris- eller dimensionsreglerna. Den lägger till lokal lagring av flera stammar per avverkning, summering av sortiment/volym/värde samt CSV-export. Summeringen är en matematisk summering av appens redan beräknade fältuppskattningar.
+Version 2.4 ändrar inte pris- eller dimensionsreglerna. Den lägger till lokal lagring av flera stammar per avverkning, summering av sortiment/volym/värde samt CSV-export. Summeringen är en matematisk summering av appens redan beräknade fältuppskattningar.
 
 
-## Nytt i version 2.3
+## Nytt i version 2.4
 
-Version 2.3 ändrar inte pris- eller dimensionsreglerna. Användaren anger nu stamlängden separat för varje träd och alla diameterinmatningar görs i centimeter på bark. Appen konverterar centimeter till millimeter internt före barkberäkning, diameterklassning och prisberäkning. Efter “Spara & nästa stam” nollställs stamlängd och mätprofil för att minska risken att föregående träds längd används av misstag.
+Version 2.4 ändrar inte pris- eller dimensionsreglerna. Den separata stamlängdsrutan är borttagen. Trädets mätta stamlängd bestäms automatiskt av den sista kompletta mätpunkten och appen apterar aldrig längre än denna punkt. Diameterinmatningar görs i centimeter på bark och konverteras internt till millimeter före barkberäkning, diameterklassning och prisberäkning.

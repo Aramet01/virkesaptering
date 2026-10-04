@@ -5,7 +5,7 @@
 
   const $ = (s) => document.querySelector(s);
   const els = {
-    species: $('#species'), quality: $('#quality'), stemLength: $('#stemLength'), objective: $('#objective'),
+    species: $('#species'), quality: $('#quality'), objective: $('#objective'),
     massavedQuality: $('#massavedQuality'), massavedTransport: $('#massavedTransport'),
     startM: $('#startM'), kerfMm: $('#kerfMm'), dbhPointM: $('#dbhPointM'), latitudeDeg: $('#latitudeDeg'), allowUnder: $('#allowUnder'),
     points: $('#points'), pointCount: $('#pointCount'), message: $('#message'), calculate: $('#calculate'),
@@ -19,7 +19,8 @@
     harvestStats: $('#harvestStats'), harvestRows: $('#harvestRows'), harvestEmpty: $('#harvestEmpty'), exportCsv: $('#exportCsv'), finishHarvest: $('#finishHarvest')
   };
 
-  const STORE = 'virkesaptering-state-v3';
+  const STORE = 'virkesaptering-state-v4';
+  const OLD_STORE_V3 = 'virkesaptering-state-v3';
   const OLD_STORE_V2 = 'virkesaptering-state-v2';
   const OLD_STORE_V1 = 'virkesaptering-state-v1';
   const HARVEST_STORE = 'virkesaptering-harvests-v1';
@@ -102,23 +103,19 @@
     clearResults();
   }
 
-  function generateGrid(interval) {
-    const total = Number(els.stemLength.value);
-    if (!Number.isFinite(total) || total < 2.9) {
-      els.message.textContent = 'Ange stammens längd först.'; return;
-    }
-    els.points.innerHTML = '';
-    const dbh = Number(els.dbhPointM.value);
-    const vals = new Set();
-    vals.add(0.1);
-    if (Number.isFinite(dbh) && dbh > 0 && dbh < total) vals.add(Math.round(dbh*100)/100);
-    for (let x=interval; x<total; x+=interval) vals.add(Math.round(x*100)/100);
-    vals.add(Math.round(total*100)/100);
-    [...vals].sort((a,b)=>a-b).forEach(x => pointRow(x.toFixed(x % 1 ? 2 : 1), ''));
-    els.message.textContent = 'Fyll i diametern utanpå bark i cm vid varje mätpunkt.';
+  function measuredStemLength(points=completePoints()) {
+    if (!points.length) return 0;
+    return Math.max(...points.map(p => Number(p.x)).filter(Number.isFinite));
+  }
+
+  function addNextPoint(offsetM) {
+    const rows = getPointRows();
+    const xs = rows.map(r => Number(r.x)).filter(Number.isFinite);
+    const last = xs.length ? Math.max(...xs) : 0.1;
+    const next = Math.round((last + Number(offsetM)) * 100) / 100;
+    const row = pointRow(next.toFixed(next % 1 ? 2 : 1), '');
+    row.querySelector('.pd').focus();
     saveState(); clearResults();
-    const firstEmpty = els.points.querySelector('.pd');
-    if (firstEmpty) firstEmpty.focus();
   }
 
   function addManualPoint() {
@@ -345,7 +342,7 @@
       species:els.species.value,
       quality:els.quality.value,
       qualityLabel:qualityLabel(els.species.value, els.quality.value),
-      stemLength:Number(els.stemLength.value)||0,
+      stemLength:Number(result.totalLengthM)||measuredStemLength(),
       objective:els.objective.value,
       massavedQuality:els.massavedQuality.value,
       massavedTransportKm:Number(els.massavedTransport.value)||0,
@@ -386,10 +383,12 @@
   }
 
   function prepareNextStem() {
-    // Varje träd får en egen stamlängd. Töm både längd och mätprofil så att
-    // föregående träd inte av misstag styr nästa aptering.
-    els.stemLength.value = '';
+    // Nästa träd börjar med en tom mätprofil. Sista kompletta mätpunkten
+    // bestämmer automatiskt det trädets mätta stamlängd.
     els.points.innerHTML = '';
+    pointRow('0.1','');
+    pointRow('1.1','');
+    pointRow('2.1','');
     updatePointCount();
     currentResult = null;
     currentStemSaved = false;
@@ -398,9 +397,10 @@
     els.logTableSection.classList.add('hidden');
     saveState();
     updateSaveButtons();
-    els.message.textContent = 'Föregående stam är sparad. Ange stamlängden för nästa träd och skapa sedan mätpunkter.';
-    els.stemLength.focus();
-    const card = els.stemLength.closest('.card');
+    els.message.textContent = 'Föregående stam är sparad. Mät nästa träd; sista kompletta mätpunkten blir stamlängden.';
+    const first = els.points.querySelector('.pd');
+    if (first) first.focus();
+    const card = els.points.closest('.card');
     if (card) card.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
@@ -481,12 +481,12 @@
   function calculate() {
     updatePointCount();
     const points = completePoints();
-    const result = L.optimizeStem(points, Number(els.stemLength.value), options());
+    const result = L.optimizeStem(points, null, options());
     if (!result.ok) {
       clearResults(); els.message.textContent = result.error; return;
     }
     render(result);
-    els.message.textContent = result.extrapolated ? 'Beräkningen är klar, men delar av profilen är extrapolerade.' : 'Beräkningen är klar.';
+    els.message.textContent = result.extrapolated ? `Beräkningen är klar för ${fmt(result.totalLengthM,2)} m mätt stam, men delar av profilen är extrapolerade.` : `Beräkningen är klar för ${fmt(result.totalLengthM,2)} m mätt stam.`;
     saveState();
     els.resultSection.scrollIntoView({behavior:'smooth', block:'start'});
   }
@@ -495,7 +495,6 @@
     return {
       species:els.species.value,
       quality:els.quality.value,
-      stemLength:els.stemLength.value,
       objective:els.objective.value,
       massavedQuality:els.massavedQuality.value,
       massavedTransport:els.massavedTransport.value,
@@ -514,8 +513,12 @@
 
   function loadState() {
     let s=null;
-    let source='v3';
+    let source='v4';
     try { s=JSON.parse(localStorage.getItem(STORE)||'null'); } catch (_) {}
+    if (!s) {
+      source='v3';
+      try { s=JSON.parse(localStorage.getItem(OLD_STORE_V3)||'null'); } catch (_) {}
+    }
     if (!s) {
       source='v2';
       try { s=JSON.parse(localStorage.getItem(OLD_STORE_V2)||'null'); } catch (_) {}
@@ -528,7 +531,6 @@
     els.species.value=s.species||'tall';
     setQualityOptions(false);
     if ([...els.quality.options].some(o=>o.value===s.quality)) els.quality.value=s.quality;
-    els.stemLength.value=s.stemLength||'';
     els.objective.value=s.objective||'value';
     els.massavedQuality.value=s.massavedQuality||'prima';
     els.massavedTransport.value=s.massavedTransport??'0';
@@ -538,8 +540,8 @@
     els.latitudeDeg.value=s.latitudeDeg||'64.25';
     els.allowUnder.checked=!!s.allowUnder;
     els.points.innerHTML='';
-    (s.points||[]).forEach(p=>pointRow(p.x, source === 'v3' ? p.d : (Number(p.d)/10)));
-    if (source !== 'v3') saveState();
+    (s.points||[]).forEach(p=>pointRow(p.x, (source === 'v4' || source === 'v3') ? p.d : (Number(p.d)/10)));
+    if (source !== 'v4') saveState();
     return true;
   }
 
@@ -605,7 +607,7 @@
     const h = activeHarvest();
     if (!h || !h.stems.length) return;
     const t = harvestTotals(h);
-    const headers = ['Radtyp','Avverkning','Stamnr','Bitnr','Sparad','Träslag','Timmerkvalitet','Stamlängd_m','Sortiment','Från_m','Till_m','Längd_m','Topp_pb_cm','Topp_ub_cm','Klass_kvalitet','Pris_kr_m3fub','Volym_m3fub','Värde_kr','Timmer_st','Underdim_st','Massaved_st','Timmer_m3fub','Massaved_m3fub','Totalt_m3fub','Timmervärde_kr','Massavedsvärde_kr','Transportavdrag_massaved_kr','Totalt_värde_kr','Rest_m','Extrapolerad'];
+    const headers = ['Radtyp','Avverkning','Stamnr','Bitnr','Sparad','Träslag','Timmerkvalitet','Mätt_stamlängd_m','Sortiment','Från_m','Till_m','Längd_m','Topp_pb_cm','Topp_ub_cm','Klass_kvalitet','Pris_kr_m3fub','Volym_m3fub','Värde_kr','Timmer_st','Underdim_st','Massaved_st','Timmer_m3fub','Massaved_m3fub','Totalt_m3fub','Timmervärde_kr','Massavedsvärde_kr','Transportavdrag_massaved_kr','Totalt_värde_kr','Rest_m','Extrapolerad'];
     const rows = [headers];
     rows.push(['SAMMANFATTNING',h.name,'','','', '', '', '', '', '', '', '', '', '', '', '', '', '', t.timberCount, t.underCount, t.massavedCount, csvNumber(t.timberVolume), csvNumber(t.massavedVolume), csvNumber(t.volume), csvNumber(t.timberValue,2), csvNumber(t.massavedValue,2), csvNumber(t.transportDeductionValue,2), csvNumber(t.value,2), '', '']);
     h.stems.forEach((s, i) => {
@@ -627,6 +629,7 @@
   function resetAll() {
     if (!confirm('Nollställa ALL lokal data, inklusive alla sparade avverkningar och stammar? Detta går inte att ångra.')) return;
     localStorage.removeItem(STORE);
+    localStorage.removeItem(OLD_STORE_V3);
     localStorage.removeItem(OLD_STORE_V2);
     localStorage.removeItem(OLD_STORE_V1);
     localStorage.removeItem(HARVEST_STORE);
@@ -637,8 +640,8 @@
     els.offlineStatus.textContent = navigator.onLine ? 'Online · offlineklar' : 'Offline';
   }
 
-  $('#grid1').addEventListener('click', ()=>generateGrid(1));
-  $('#grid2').addEventListener('click', ()=>generateGrid(2));
+  $('#next1').addEventListener('click', ()=>addNextPoint(1));
+  $('#next2').addEventListener('click', ()=>addNextPoint(2));
   $('#addPoint').addEventListener('click', addManualPoint);
   $('#clearDiameters').addEventListener('click', clearDiameters);
   $('#resetAll').addEventListener('click', resetAll);
@@ -652,13 +655,13 @@
   els.harvestName.addEventListener('change', renameHarvest);
   els.harvestSelect.addEventListener('change', e=>switchHarvest(e.target.value));
   els.species.addEventListener('change', ()=>{setQualityOptions(true);inputChanged();});
-  [els.quality,els.stemLength,els.objective,els.massavedQuality,els.massavedTransport,els.startM,els.kerfMm,els.dbhPointM,els.latitudeDeg,els.allowUnder].forEach(el=>el.addEventListener('change',inputChanged));
+  [els.quality,els.objective,els.massavedQuality,els.massavedTransport,els.startM,els.kerfMm,els.dbhPointM,els.latitudeDeg,els.allowUnder].forEach(el=>el.addEventListener('change',inputChanged));
   window.addEventListener('online',networkStatus);
   window.addEventListener('offline',networkStatus);
   networkStatus();
 
   setQualityOptions(false);
-  if (!loadState()) { updatePointCount(); els.message.textContent = 'Ange stamlängden för första trädet och välj sedan mätpunkter var 1 m, var 2 m eller manuellt.'; } else updatePointCount();
+  if (!loadState()) { els.points.innerHTML=''; pointRow('0.1',''); pointRow('1.1',''); pointRow('2.1',''); updatePointCount(); els.message.textContent = 'Mät första trädet. Lägg till punkter med +1 m, +2 m eller valfritt; sista kompletta mätpunkten blir stamlängden.'; } else updatePointCount();
   loadHarvestData();
   updateSaveButtons();
 
