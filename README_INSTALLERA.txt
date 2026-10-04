@@ -1,5 +1,5 @@
 VIRKESAPTERING – PWA FÖR IPHONE
-Version 2.2
+Version 2.3
 
 Vad paketet innehåller
 ----------------------
@@ -38,7 +38,7 @@ Användning
 1. Välj tall eller gran och kvalitetsklass.
 2. Ange hela stammens längd.
 3. Skapa mätpunkter var 1 m eller 2 m, eller lägg in egna.
-4. Klava diametern UTANPÅ BARK vid mätpunkterna och fyll i mm.
+4. Klava diametern UTANPÅ BARK vid mätpunkterna och fyll i cm, till exempel 32,4 cm.
 5. Välj massavedskvalitet (prima/sekunda) och ange transportavståndet i km till mottagande industri om du vill räkna transportavdrag.
 6. Tryck "Aptera hela stammen".
 7. Appen visar timmer och massaved separat, med längder, kapmått, volym och uppskattat värde.
@@ -47,16 +47,16 @@ Användning
 10. "Exportera CSV" skapar en Excel-vänlig semikolonseparerad fil med både stamsummering och varje apterad bit.
 11. "Avsluta avverkning" låser den valda avverkningen. Använd "+ Ny avverkning" för nästa objekt/dag.
 
-Mät- och prisregler i version 2.2
+Mät- och prisregler i version 2.3
 ---------------------------------
 - Prislista: Norra Skog NS46-01, giltig från 2026-04-20 för bland annat Vindeln.
 - Tillåtna prislistelängder: 340, 370, 400, 430, 460, 490, 520 och 550 cm.
-- Normalt sågtimmer: minst 140 mm toppdiameter under bark i kalkylen.
-- 120–139 mm under bark kan valfritt räknas som underdimension till 360 kr/m³fub.
-- Maxdiameter: 600 mm under bark på stockens grövsta del.
+- Normalt sågtimmer: minst 14,0 cm toppdiameter under bark i kalkylen.
+- 12,0–13,9 cm under bark kan valfritt räknas som underdimension till 360 kr/m³fub.
+- Maxdiameter: 60 cm under bark på stockens grövsta del.
 - Tall- och granpriser samt längdkorrektioner är inlagda från NS46-01.
 - Barrmassaved prima: 410 kr/m³fub. Sekunda: 360 kr/m³fub.
-- Massaved: 2,90–5,70 m, min 50 mm ub, max 700 mm ub.
+- Massaved: 2,90–5,70 m, min 5 cm ub, max 70 cm ub.
 - Appen planerar massaved i 10 cm steg.
 - Transportavdrag för massaved räknas automatiskt som 0,35 kr/m³fub per km, högst 80 kr/m³fub. Du anger km; 0 visar baspriset före transportavdrag.
 - Vid värdeoptimering jämförs timmer och massaved längs hela stammen. Vid "flest timmerstockar" prioriteras först antalet normala timmerstockar och sedan totalvärdet.
@@ -101,7 +101,7 @@ Skogforsk, Björn Hannrup (2004): Funktioner för skattning av barkens tjocklek 
 https://www.skogforsk.se/kunskapsbanken/kunskapsartiklar/2004/funktioner-for-skattning-av-barkens-tjocklek-hos-tall-och-gran-vid-avverkning-med-skordare/
 
 
-Avverkningssammanställning – version 2.2
+Avverkningssammanställning – version 2.3
 ----------------------------------------
 - Flera stammar kan sparas i samma avverkning.
 - Appen summerar tall/gran, timmerstockar, massavedsbitar, underdimension, volym och uppskattat värde.
@@ -109,3 +109,12 @@ Avverkningssammanställning – version 2.2
 - Avslutade avverkningar är skrivskyddade i appen.
 - CSV-export innehåller en totalrad, en rad per stam och en rad per apterad timmer-/massavedsbit.
 - All avverkningsdata sparas lokalt i webbläsarens lagring på enheten. Rensa inte webbplatsdata om historiken ska bevaras.
+
+
+Nytt i version 2.3
+-------------------
+- Stamlängd anges separat för varje träd.
+- Efter ”Spara & nästa stam” töms stamlängden och mätprofilen så att nästa träd måste få sin egen längd.
+- Diameter matas in i centimeter på bark (t.ex. 32,4 cm), inte millimeter.
+- Appen räknar internt om cm till mm eftersom Norra Skogs prislista och barkfunktionerna använder mm.
+- Visade toppdiametrar och CSV-export anges i cm.

@@ -19,8 +19,9 @@
     harvestStats: $('#harvestStats'), harvestRows: $('#harvestRows'), harvestEmpty: $('#harvestEmpty'), exportCsv: $('#exportCsv'), finishHarvest: $('#finishHarvest')
   };
 
-  const STORE = 'virkesaptering-state-v2';
-  const OLD_STORE = 'virkesaptering-state-v1';
+  const STORE = 'virkesaptering-state-v3';
+  const OLD_STORE_V2 = 'virkesaptering-state-v2';
+  const OLD_STORE_V1 = 'virkesaptering-state-v1';
   const HARVEST_STORE = 'virkesaptering-harvests-v1';
   let rowId = 0;
   let currentResult = null;
@@ -70,7 +71,7 @@
     row.dataset.id = id;
     row.innerHTML = `
       <input class="px" aria-label="Avstånd från rotskäret i meter" type="number" inputmode="decimal" min="0" max="40" step="0.1" value="${x}">
-      <input class="pd" aria-label="Diameter på bark i millimeter" type="number" inputmode="numeric" min="20" max="900" step="1" value="${d}">
+      <input class="pd" aria-label="Diameter på bark i centimeter" type="number" inputmode="decimal" min="2" max="90" step="0.1" value="${d}">
       <button class="remove" aria-label="Ta bort mätpunkt" type="button">×</button>`;
     row.querySelector('.remove').addEventListener('click', () => { row.remove(); inputChanged(); });
     row.querySelectorAll('input').forEach(i => i.addEventListener('input', inputChanged));
@@ -87,7 +88,7 @@
   }
 
   function completePoints() {
-    return getPointRows().map(p => ({x:Number(p.x), d:Number(p.d)})).filter(p => Number.isFinite(p.x) && Number.isFinite(p.d) && p.d > 0);
+    return getPointRows().map(p => ({x:Number(p.x), d:Number(p.d) * 10})).filter(p => Number.isFinite(p.x) && Number.isFinite(p.d) && p.d > 0);
   }
 
   function updatePointCount() {
@@ -114,7 +115,7 @@
     for (let x=interval; x<total; x+=interval) vals.add(Math.round(x*100)/100);
     vals.add(Math.round(total*100)/100);
     [...vals].sort((a,b)=>a-b).forEach(x => pointRow(x.toFixed(x % 1 ? 2 : 1), ''));
-    els.message.textContent = 'Fyll i diametern utanpå bark vid varje mätpunkt.';
+    els.message.textContent = 'Fyll i diametern utanpå bark i cm vid varje mätpunkt.';
     saveState(); clearResults();
     const firstEmpty = els.points.querySelector('.pd');
     if (firstEmpty) firstEmpty.focus();
@@ -385,7 +386,10 @@
   }
 
   function prepareNextStem() {
-    els.points.querySelectorAll('.pd').forEach(i => i.value='');
+    // Varje träd får en egen stamlängd. Töm både längd och mätprofil så att
+    // föregående träd inte av misstag styr nästa aptering.
+    els.stemLength.value = '';
+    els.points.innerHTML = '';
     updatePointCount();
     currentResult = null;
     currentStemSaved = false;
@@ -394,10 +398,9 @@
     els.logTableSection.classList.add('hidden');
     saveState();
     updateSaveButtons();
-    els.message.textContent = 'Föregående stam är sparad. Fyll i diametrarna för nästa stam.';
-    const first = els.points.querySelector('.pd');
-    if (first) first.focus();
-    const card = els.points.closest('.card');
+    els.message.textContent = 'Föregående stam är sparad. Ange stamlängden för nästa träd och skapa sedan mätpunkter.';
+    els.stemLength.focus();
+    const card = els.stemLength.closest('.card');
     if (card) card.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
@@ -441,7 +444,7 @@
       const isPulp = log.assortment === 'massaved';
       const row = document.createElement('div');
       row.className = `cut-row ${isPulp ? 'cut-pulp' : 'cut-timber'}`;
-      row.innerHTML = `<div class="cut-index">${idx+1}</div><div><strong>${fmt(log.lengthM,2)} m ${assortmentName(log).toLowerCase()}</strong><small>${fmt(log.startM,2)}–${fmt(log.endM,2)} m · topp ${fmt(log.top.ubMm,0)} mm ub</small></div><div class="cut-at"><small>Kapa vid</small><strong>${fmt(log.endM,2)} m</strong></div>`;
+      row.innerHTML = `<div class="cut-index">${idx+1}</div><div><strong>${fmt(log.lengthM,2)} m ${assortmentName(log).toLowerCase()}</strong><small>${fmt(log.startM,2)}–${fmt(log.endM,2)} m · topp ${fmt(log.top.ubMm/10,1)} cm ub</small></div><div class="cut-at"><small>Kapa vid</small><strong>${fmt(log.endM,2)} m</strong></div>`;
       els.cutPlan.appendChild(row);
     });
 
@@ -467,9 +470,9 @@
     result.plan.forEach((log, idx) => {
       const tr = document.createElement('tr');
       const assortment = assortmentName(log);
-      const klass = log.pricing.cls;
+      const klass = log.assortment === 'timmer' && /^\d/.test(String(log.pricing.cls)) ? `${String(log.pricing.cls).replace('120–139','12,0–13,9').replace(/^(140|160|180|200|220|240|260|280|300|400)$/, m => fmt(Number(m)/10,1))} cm` : log.pricing.cls;
       tr.className = log.assortment === 'massaved' ? 'row-pulp' : 'row-timber';
-      tr.innerHTML = `<td><strong>${idx+1}</strong></td><td><span class="sort-badge ${log.assortment === 'massaved' ? 'badge-pulp' : 'badge-timber'}">${assortment}</span></td><td>${fmt(log.startM,2)}–${fmt(log.endM,2)} m</td><td>${fmt(log.lengthM,2)} m</td><td>${fmt(log.top.obMm,0)} mm</td><td><strong>${fmt(log.top.ubMm,0)} mm</strong></td><td>${klass}</td><td>${fmt(log.pricing.price,0)} kr/m³fub</td><td>${fmt(log.volume,3)}</td><td><strong>${fmt(log.value,0)} kr</strong></td>`;
+      tr.innerHTML = `<td><strong>${idx+1}</strong></td><td><span class="sort-badge ${log.assortment === 'massaved' ? 'badge-pulp' : 'badge-timber'}">${assortment}</span></td><td>${fmt(log.startM,2)}–${fmt(log.endM,2)} m</td><td>${fmt(log.lengthM,2)} m</td><td>${fmt(log.top.obMm/10,1)} cm</td><td><strong>${fmt(log.top.ubMm/10,1)} cm</strong></td><td>${klass}</td><td>${fmt(log.pricing.price,0)} kr/m³fub</td><td>${fmt(log.volume,3)}</td><td><strong>${fmt(log.value,0)} kr</strong></td>`;
       els.logRows.appendChild(tr);
     });
     updateSaveButtons();
@@ -511,15 +514,21 @@
 
   function loadState() {
     let s=null;
+    let source='v3';
     try { s=JSON.parse(localStorage.getItem(STORE)||'null'); } catch (_) {}
     if (!s) {
-      try { s=JSON.parse(localStorage.getItem(OLD_STORE)||'null'); } catch (_) {}
+      source='v2';
+      try { s=JSON.parse(localStorage.getItem(OLD_STORE_V2)||'null'); } catch (_) {}
+    }
+    if (!s) {
+      source='v1';
+      try { s=JSON.parse(localStorage.getItem(OLD_STORE_V1)||'null'); } catch (_) {}
     }
     if (!s) return false;
     els.species.value=s.species||'tall';
     setQualityOptions(false);
     if ([...els.quality.options].some(o=>o.value===s.quality)) els.quality.value=s.quality;
-    els.stemLength.value=s.stemLength||'18.0';
+    els.stemLength.value=s.stemLength||'';
     els.objective.value=s.objective||'value';
     els.massavedQuality.value=s.massavedQuality||'prima';
     els.massavedTransport.value=s.massavedTransport??'0';
@@ -529,7 +538,8 @@
     els.latitudeDeg.value=s.latitudeDeg||'64.25';
     els.allowUnder.checked=!!s.allowUnder;
     els.points.innerHTML='';
-    (s.points||[]).forEach(p=>pointRow(p.x,p.d));
+    (s.points||[]).forEach(p=>pointRow(p.x, source === 'v3' ? p.d : (Number(p.d)/10)));
+    if (source !== 'v3') saveState();
     return true;
   }
 
@@ -595,13 +605,13 @@
     const h = activeHarvest();
     if (!h || !h.stems.length) return;
     const t = harvestTotals(h);
-    const headers = ['Radtyp','Avverkning','Stamnr','Bitnr','Sparad','Träslag','Timmerkvalitet','Stamlängd_m','Sortiment','Från_m','Till_m','Längd_m','Topp_pb_mm','Topp_ub_mm','Klass_kvalitet','Pris_kr_m3fub','Volym_m3fub','Värde_kr','Timmer_st','Underdim_st','Massaved_st','Timmer_m3fub','Massaved_m3fub','Totalt_m3fub','Timmervärde_kr','Massavedsvärde_kr','Transportavdrag_massaved_kr','Totalt_värde_kr','Rest_m','Extrapolerad'];
+    const headers = ['Radtyp','Avverkning','Stamnr','Bitnr','Sparad','Träslag','Timmerkvalitet','Stamlängd_m','Sortiment','Från_m','Till_m','Längd_m','Topp_pb_cm','Topp_ub_cm','Klass_kvalitet','Pris_kr_m3fub','Volym_m3fub','Värde_kr','Timmer_st','Underdim_st','Massaved_st','Timmer_m3fub','Massaved_m3fub','Totalt_m3fub','Timmervärde_kr','Massavedsvärde_kr','Transportavdrag_massaved_kr','Totalt_värde_kr','Rest_m','Extrapolerad'];
     const rows = [headers];
     rows.push(['SAMMANFATTNING',h.name,'','','', '', '', '', '', '', '', '', '', '', '', '', '', '', t.timberCount, t.underCount, t.massavedCount, csvNumber(t.timberVolume), csvNumber(t.massavedVolume), csvNumber(t.volume), csvNumber(t.timberValue,2), csvNumber(t.massavedValue,2), csvNumber(t.transportDeductionValue,2), csvNumber(t.value,2), '', '']);
     h.stems.forEach((s, i) => {
       rows.push(['STAM',h.name,i+1,'',formatDateTime(s.savedAt),s.species === 'gran' ? 'Gran' : 'Tall',s.qualityLabel,csvNumber(s.stemLength,2),'','','','','','','','','','',s.summary.normalCount,s.summary.underCount,s.summary.massavedCount,csvNumber(s.summary.timberVolume),csvNumber(s.summary.massavedVolume),csvNumber(s.summary.volume),csvNumber(s.summary.timberValue,2),csvNumber(s.summary.massavedValue,2),csvNumber(s.summary.transportDeductionValue,2),csvNumber(s.summary.value,2),csvNumber(s.summary.remainingM,2),s.summary.extrapolated?'Ja':'Nej']);
       (s.plan || []).forEach((log, j) => {
-        rows.push(['BIT',h.name,i+1,j+1,formatDateTime(s.savedAt),s.species === 'gran' ? 'Gran' : 'Tall',s.qualityLabel,csvNumber(s.stemLength,2),log.assortment === 'massaved' ? 'Massaved' : (log.underDimension ? 'Underdim. timmer' : 'Timmer'),csvNumber(log.startM,2),csvNumber(log.endM,2),csvNumber(log.lengthM,2),csvNumber(log.top.obMm,0),csvNumber(log.top.ubMm,0),log.pricing.cls,csvNumber(log.pricing.price,2),csvNumber(log.volume),csvNumber(log.value,2),'','','','','','','','','','','',log.extrapolated?'Ja':'Nej']);
+        rows.push(['BIT',h.name,i+1,j+1,formatDateTime(s.savedAt),s.species === 'gran' ? 'Gran' : 'Tall',s.qualityLabel,csvNumber(s.stemLength,2),log.assortment === 'massaved' ? 'Massaved' : (log.underDimension ? 'Underdim. timmer' : 'Timmer'),csvNumber(log.startM,2),csvNumber(log.endM,2),csvNumber(log.lengthM,2),csvNumber(log.top.obMm/10,1),csvNumber(log.top.ubMm/10,1),log.pricing.cls,csvNumber(log.pricing.price,2),csvNumber(log.volume),csvNumber(log.value,2),'','','','','','','','','','','',log.extrapolated?'Ja':'Nej']);
       });
     });
     const text = '\ufeff' + rows.map(row => row.map(csvEscape).join(';')).join('\r\n');
@@ -617,7 +627,8 @@
   function resetAll() {
     if (!confirm('Nollställa ALL lokal data, inklusive alla sparade avverkningar och stammar? Detta går inte att ångra.')) return;
     localStorage.removeItem(STORE);
-    localStorage.removeItem(OLD_STORE);
+    localStorage.removeItem(OLD_STORE_V2);
+    localStorage.removeItem(OLD_STORE_V1);
     localStorage.removeItem(HARVEST_STORE);
     location.reload();
   }
@@ -647,7 +658,7 @@
   networkStatus();
 
   setQualityOptions(false);
-  if (!loadState()) generateGrid(2); else updatePointCount();
+  if (!loadState()) { updatePointCount(); els.message.textContent = 'Ange stamlängden för första trädet och välj sedan mätpunkter var 1 m, var 2 m eller manuellt.'; } else updatePointCount();
   loadHarvestData();
   updateSaveButtons();
 

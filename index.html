@@ -36,8 +36,9 @@
         <label>Timmerkvalitet
           <select id="quality"></select>
         </label>
-        <label>Hela stammens längd (m)
-          <input id="stemLength" type="number" inputmode="decimal" min="2.9" max="40" step="0.1" value="18.0">
+        <label>Stamlängd för detta träd (m)
+          <input id="stemLength" type="number" inputmode="decimal" min="2.9" max="40" step="0.1" value="" placeholder="t.ex. 18,5">
+          <small class="field-help">Ange längden för varje träd separat, till den punkt där du vill att appen ska sluta aptera. Fältet töms efter “Spara & nästa stam”.</small>
         </label>
         <label>Optimera för
           <select id="objective">
@@ -73,7 +74,7 @@
           </label>
           <label class="checkrow">
             <input id="allowUnder" type="checkbox">
-            <span>Tillåt 120–139 mm ub som underdimension timmer (360 kr/m³fub)</span>
+            <span>Tillåt 12,0–13,9 cm ub som underdimension timmer (360 kr/m³fub)</span>
           </label>
         </div>
       </details>
@@ -83,11 +84,11 @@
       <div class="assortment-grid">
         <div class="assortment-box timber-box">
           <strong>Timmer</strong>
-          <span>3,40–5,50 m · normalt från 140 mm ub i topp · max 600 mm ub</span>
+          <span>3,40–5,50 m · normalt från 14,0 cm ub i topp · max 60 cm ub</span>
         </div>
         <div class="assortment-box pulp-box">
           <strong>Barrmassaved</strong>
-          <span>2,90–5,70 m · 50–700 mm ub · prima 410 / sekunda 360 kr/m³fub före transportavdrag</span>
+          <span>2,90–5,70 m · 5–70 cm ub · prima 410 / sekunda 360 kr/m³fub före transportavdrag</span>
         </div>
       </div>
     </section>
@@ -119,7 +120,7 @@
       <div class="section-head">
         <div>
           <h2>Mätpunkter</h2>
-          <p>Avstånd från rotskäret och diameter <strong>utanpå bark</strong>.</p>
+          <p>Avstånd från rotskäret och diameter <strong>utanpå bark i cm</strong>.</p>
         </div>
         <span id="pointCount" class="mini-pill">0 punkter</span>
       </div>
@@ -131,7 +132,7 @@
         <button class="ghost" id="clearDiameters" type="button">Töm diametrar</button>
       </div>
 
-      <div class="measure-head" aria-hidden="true"><span>Avstånd</span><span>Ø på bark</span><span></span></div>
+      <div class="measure-head" aria-hidden="true"><span>Avstånd (m)</span><span>Ø på bark (cm)</span><span></span></div>
       <div id="points" class="measure-list"></div>
       <p id="measureHint" class="hint">Fyll i minst tre diametrar. Ju fler punkter, desto säkrare stamprofil.</p>
     </section>
@@ -175,7 +176,7 @@
       <div class="section-head"><div><h2>Sortimentsdetaljer</h2><p>Timmer och barrmassaved redovisas var för sig.</p></div></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Sortiment</th><th>Från–till</th><th>Längd</th><th>Topp Ø pb</th><th>Topp Ø ub</th><th>Klass/kvalitet</th><th>Pris</th><th>m³fub*</th><th>Värde*</th></tr></thead>
+          <thead><tr><th>#</th><th>Sortiment</th><th>Från–till</th><th>Längd</th><th>Topp Ø pb (cm)</th><th>Topp Ø ub (cm)</th><th>Klass/kvalitet</th><th>Pris</th><th>m³fub*</th><th>Värde*</th></tr></thead>
           <tbody id="logRows"></tbody>
         </table>
       </div>
@@ -209,8 +210,8 @@
       <h2>Om beräkningen</h2>
       <ul>
         <li>Prislistan är Norra Skog NS46-01 för Vindeln, giltig från 2026-04-20.</li>
-        <li>Normalt timmer räknas från 140 mm toppdiameter under bark. 120–139 mm kan valfritt räknas som underdimension.</li>
-        <li>Barrmassaved räknas med prislistans dimensioner 2,90–5,70 m, 50–700 mm ub.</li>
+        <li>Normalt timmer räknas från 14,0 cm toppdiameter under bark. 12,0–13,9 cm kan valfritt räknas som underdimension. Appen räknar internt om cm till mm för prislistans diameterklasser.</li>
+        <li>Barrmassaved räknas med prislistans dimensioner 2,90–5,70 m och 5–70 cm ub.</li>
         <li>Massaved planeras i 10 cm steg i appen för att ge praktiska kapmått.</li>
         <li>Massavedens baspris är 410 kr/m³fub prima och 360 kr/m³fub sekunda. Transportavdrag räknas som 0,35 kr/m³fub per km, högst 80 kr/m³fub.</li>
         <li>Tall och gran får enligt prislistan samsorteras i barrmassaved. Appen håller ändå reda på valt träslag för barkberäkningen.</li>
@@ -225,7 +226,7 @@
     </section>
 
     <footer>
-      <span>Virkesaptering v2.2 · NS46-01</span>
+      <span>Virkesaptering v2.3 · NS46-01</span>
       <button id="resetAll" type="button" class="link-button">Nollställ all lokal data</button>
     </footer>
   </main>
