@@ -1,5 +1,5 @@
 VIRKESAPTERING – PWA FÖR IPHONE
-Version 2.1
+Version 2.2
 
 Vad paketet innehåller
 ----------------------
@@ -42,8 +42,12 @@ Användning
 5. Välj massavedskvalitet (prima/sekunda) och ange transportavståndet i km till mottagande industri om du vill räkna transportavdrag.
 6. Tryck "Aptera hela stammen".
 7. Appen visar timmer och massaved separat, med längder, kapmått, volym och uppskattat värde.
+8. Tryck "Spara stam" för att lägga stammen i aktuell avverkning, eller "Spara & nästa stam" för att direkt fortsätta med nästa.
+9. Under "Sammanfattning – alla stammar" visas totalsiffror för hela avverkningen.
+10. "Exportera CSV" skapar en Excel-vänlig semikolonseparerad fil med både stamsummering och varje apterad bit.
+11. "Avsluta avverkning" låser den valda avverkningen. Använd "+ Ny avverkning" för nästa objekt/dag.
 
-Mät- och prisregler i version 2.0
+Mät- och prisregler i version 2.2
 ---------------------------------
 - Prislista: Norra Skog NS46-01, giltig från 2026-04-20 för bland annat Vindeln.
 - Tillåtna prislistelängder: 340, 370, 400, 430, 460, 490, 520 och 550 cm.
@@ -95,3 +99,13 @@ https://www.biometria.se/publikationer/maetningsinstruktioner/maetningsbestaemme
 
 Skogforsk, Björn Hannrup (2004): Funktioner för skattning av barkens tjocklek hos tall och gran vid avverkning med skördare, Arbetsrapport 575:
 https://www.skogforsk.se/kunskapsbanken/kunskapsartiklar/2004/funktioner-for-skattning-av-barkens-tjocklek-hos-tall-och-gran-vid-avverkning-med-skordare/
+
+
+Avverkningssammanställning – version 2.2
+----------------------------------------
+- Flera stammar kan sparas i samma avverkning.
+- Appen summerar tall/gran, timmerstockar, massavedsbitar, underdimension, volym och uppskattat värde.
+- Flera avverkningar kan lagras lokalt och väljas i appen.
+- Avslutade avverkningar är skrivskyddade i appen.
+- CSV-export innehåller en totalrad, en rad per stam och en rad per apterad timmer-/massavedsbit.
+- All avverkningsdata sparas lokalt i webbläsarens lagring på enheten. Rensa inte webbplatsdata om historiken ska bevaras.

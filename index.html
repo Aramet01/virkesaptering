@@ -92,6 +92,29 @@
       </div>
     </section>
 
+    <section class="card harvest-card">
+      <div class="section-head">
+        <div>
+          <h2>Avverkning</h2>
+          <p>Samla alla stammar i samma avverkning och få en löpande sammanställning.</p>
+        </div>
+        <span id="harvestState" class="mini-pill">Pågående</span>
+      </div>
+      <div class="grid2 harvest-grid">
+        <label>Välj avverkning
+          <select id="harvestSelect"></select>
+        </label>
+        <label>Namn
+          <input id="harvestName" type="text" maxlength="80" placeholder="Avverkning 2026-10-04">
+        </label>
+      </div>
+      <div class="toolbar harvest-toolbar">
+        <button class="secondary" id="newHarvest" type="button">+ Ny avverkning</button>
+        <button class="secondary" id="viewSummary" type="button">Visa sammanfattning</button>
+      </div>
+      <p id="harvestMeta" class="hint"></p>
+    </section>
+
     <section class="card">
       <div class="section-head">
         <div>
@@ -135,6 +158,11 @@
       </div>
       <div class="stats" id="stats"></div>
       <div id="warningBox" class="warning hidden"></div>
+      <div class="result-actions">
+        <button id="saveStem" class="secondary save-button" type="button">Spara stam</button>
+        <button id="saveNextStem" class="primary save-button" type="button">Spara & nästa stam</button>
+      </div>
+      <p id="saveStemNote" class="hint"></p>
     </section>
 
     <section id="cutPlanSection" class="card hidden">
@@ -152,6 +180,29 @@
         </table>
       </div>
       <p class="footnote">* Volym och värde är fältuppskattningar, inte ersättningsgrundande inmätning. Massavedspris påverkas av transportavståndet du anger; appen räknar avdraget enligt prislistans formel.</p>
+    </section>
+
+    <section id="harvestSummarySection" class="card harvest-summary">
+      <div class="section-head">
+        <div>
+          <h2>Sammanfattning – alla stammar</h2>
+          <p id="harvestSummaryTitle">Aktuell avverkning</p>
+        </div>
+        <span id="harvestSummaryStatus" class="mini-pill">Pågående</span>
+      </div>
+      <div id="harvestStats" class="stats harvest-stats"></div>
+      <div class="toolbar summary-actions">
+        <button class="secondary" id="exportCsv" type="button">Exportera CSV</button>
+        <button class="ghost" id="finishHarvest" type="button">Avsluta &amp; sammanfatta</button>
+      </div>
+      <div class="table-wrap">
+        <table class="harvest-table">
+          <thead><tr><th>Stam</th><th>Träslag</th><th>Stamlängd</th><th>Timmer</th><th>Massaved</th><th>Volym*</th><th>Värde*</th><th>Sparad</th><th></th></tr></thead>
+          <tbody id="harvestRows"></tbody>
+        </table>
+      </div>
+      <p id="harvestEmpty" class="hint">Ingen stam är sparad i denna avverkning ännu.</p>
+      <p class="footnote">* Sammanställningen bygger på appens fältuppskattningar för de sparade stammarna. CSV-exporten innehåller både stamsummering och varje apterad bit.</p>
     </section>
 
     <section class="card notes">
@@ -174,8 +225,8 @@
     </section>
 
     <footer>
-      <span>Virkesaptering v2.1 · NS46-01</span>
-      <button id="resetAll" type="button" class="link-button">Nollställ sparade data</button>
+      <span>Virkesaptering v2.2 · NS46-01</span>
+      <button id="resetAll" type="button" class="link-button">Nollställ all lokal data</button>
     </footer>
   </main>
 
