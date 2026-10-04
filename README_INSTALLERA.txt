@@ -47,7 +47,7 @@ Användning
 10. "Exportera CSV" skapar en Excel-vänlig semikolonseparerad fil med både stamsummering och varje apterad bit.
 11. "Avsluta avverkning" låser den valda avverkningen. Använd "+ Ny avverkning" för nästa objekt/dag.
 
-Mät- och prisregler i version 2.4
+Mät- och prisregler i version 2.5
 ---------------------------------
 - Prislista: Norra Skog NS46-01, giltig från 2026-04-20 för bland annat Vindeln.
 - Tillåtna prislistelängder: 340, 370, 400, 430, 460, 490, 520 och 550 cm.
@@ -101,7 +101,7 @@ Skogforsk, Björn Hannrup (2004): Funktioner för skattning av barkens tjocklek 
 https://www.skogforsk.se/kunskapsbanken/kunskapsartiklar/2004/funktioner-for-skattning-av-barkens-tjocklek-hos-tall-och-gran-vid-avverkning-med-skordare/
 
 
-Avverkningssammanställning – version 2.4
+Avverkningssammanställning – version 2.5
 ----------------------------------------
 - Flera stammar kan sparas i samma avverkning.
 - Appen summerar tall/gran, timmerstockar, massavedsbitar, underdimension, volym och uppskattat värde.
@@ -121,3 +121,10 @@ Nytt i version 2.4
 - Diameter matas in i centimeter på bark (t.ex. 32,4 cm), inte millimeter.
 - Appen räknar internt om cm till mm eftersom Norra Skogs prislista och barkfunktionerna använder mm.
 - Visade toppdiametrar och CSV-export anges i cm.
+
+
+Nytt i version 2.5
+-------------------
+- Knapparna “+ 1 m”, “+ 2 m” och “+ Valfri punkt” ligger nu under den sista mätpunktsraden så att man inte behöver scrolla upp för att lägga till nästa punkt.
+- “Töm diametrar” är separerad från knapparna för nya mätpunkter och placerad till höger.
+- Innan alla diametrar töms visas en bekräftelsefråga. Avståndspunkterna behålls om tömningen bekräftas.

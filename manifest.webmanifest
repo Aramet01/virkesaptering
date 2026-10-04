@@ -1,7 +1,7 @@
 {
   "name": "Virkesaptering – Norra Skog Vindeln",
   "short_name": "Virkesaptering",
-  "description": "Offline apteringskalkyl med avverkningssammanställning, automatisk stamlängd från sista mätpunkten och cm-inmatning för timmer och massaved enligt Norra Skog NS46-01 i Vindeln.",
+  "description": "Offline apteringskalkyl med avverkningssammanställning, mätpunktsknappar under mätlistan, automatisk stamlängd från sista mätpunkten och cm-inmatning för timmer och massaved enligt Norra Skog NS46-01 i Vindeln.",
   "lang": "sv-SE",
   "start_url": "./",
   "scope": "./",

@@ -121,15 +121,18 @@
         <span id="pointCount" class="mini-pill">0 punkter</span>
       </div>
 
-      <div class="toolbar">
-        <button class="secondary" id="next1" type="button">+ 1 m</button>
-        <button class="secondary" id="next2" type="button">+ 2 m</button>
-        <button class="secondary" id="addPoint" type="button">+ Valfri punkt</button>
-        <button class="ghost" id="clearDiameters" type="button">Töm diametrar</button>
-      </div>
-
       <div class="measure-head" aria-hidden="true"><span>Avstånd (m)</span><span>Ø på bark (cm)</span><span></span></div>
       <div id="points" class="measure-list"></div>
+
+      <div class="measure-actions">
+        <div class="measure-add-actions">
+          <button class="secondary" id="next1" type="button">+ 1 m</button>
+          <button class="secondary" id="next2" type="button">+ 2 m</button>
+          <button class="secondary" id="addPoint" type="button">+ Valfri punkt</button>
+        </div>
+        <button class="ghost clear-diameters" id="clearDiameters" type="button">Töm diametrar</button>
+      </div>
+
       <p id="measureHint" class="hint">Fyll i minst tre diametrar. Appen använder den sista kompletta mätpunkten som trädets stamlängd och apterar aldrig längre än dit.</p>
     </section>
 
@@ -223,7 +226,7 @@
     </section>
 
     <footer>
-      <span>Virkesaptering v2.4 · NS46-01</span>
+      <span>Virkesaptering v2.5 · NS46-01</span>
       <button id="resetAll" type="button" class="link-button">Nollställ all lokal data</button>
     </footer>
   </main>

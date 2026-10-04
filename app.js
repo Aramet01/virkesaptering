@@ -125,7 +125,11 @@
   }
 
   function clearDiameters() {
-    els.points.querySelectorAll('.pd').forEach(i => i.value='');
+    const diameterInputs = [...els.points.querySelectorAll('.pd')];
+    const hasDiameter = diameterInputs.some(i => String(i.value).trim() !== '');
+    if (!hasDiameter) return;
+    if (!confirm('Är du säker på att du vill tömma alla diametrar? Avståndspunkterna behålls.')) return;
+    diameterInputs.forEach(i => i.value='');
     updatePointCount(); saveState(); clearResults();
     const first = els.points.querySelector('.pd'); if (first) first.focus();
   }
