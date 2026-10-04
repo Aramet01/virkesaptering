@@ -75,3 +75,7 @@ Version 2.4 ändrar inte pris- eller dimensionsreglerna. Den lägger till lokal 
 ## Nytt i version 2.4
 
 Version 2.4 ändrar inte pris- eller dimensionsreglerna. Den separata stamlängdsrutan är borttagen. Trädets mätta stamlängd bestäms automatiskt av den sista kompletta mätpunkten och appen apterar aldrig längre än denna punkt. Diameterinmatningar görs i centimeter på bark och konverteras internt till millimeter före barkberäkning, diameterklassning och prisberäkning.
+
+
+## Appändring v2.6
+Första standardmätpunkten i fältgränssnittet är 0,0 m vid rotskäret och brösthöjdspunkten är satt till 1,40 m från rotskäret enligt användarens valda mätsätt. Detta är en inmatnings-/arbetsflödesinställning och ändrar inte Norra Skogs prislista.

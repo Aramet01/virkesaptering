@@ -70,8 +70,7 @@ För tall används brösthöjdsdiameter, höjd från rotänden och latitud.
 För gran används brösthöjdsdiameter och aktuell diameter på bark.
 Standardlatituden i appen är 64,25° N, motsvarande cirka Vindeln.
 
-Brösthöjdspunkten anges som avstånd FRÅN ROTSKÄRET. Standard är 1,10 m. Om trädet är
-fällt på en annan stubbhöjd bör detta värde justeras så att punkten motsvarar 1,30 m över mark.
+Brösthöjdspunkten anges som avstånd FRÅN ROTSKÄRET. Standard i appen är nu 1,40 m från rotskäret enligt det valda mätsättet.
 
 Noggrannhet / begränsningar
 ---------------------------
@@ -128,3 +127,10 @@ Nytt i version 2.5
 - Knapparna “+ 1 m”, “+ 2 m” och “+ Valfri punkt” ligger nu under den sista mätpunktsraden så att man inte behöver scrolla upp för att lägga till nästa punkt.
 - “Töm diametrar” är separerad från knapparna för nya mätpunkter och placerad till höger.
 - Innan alla diametrar töms visas en bekräftelsefråga. Avståndspunkterna behålls om tömningen bekräftas.
+
+
+VERSION 2.6
+- Första standardmätpunkten är nu 0,0 m vid rotskäret.
+- Nästa standardpunkter är 1,0 m och 2,0 m.
+- Brösthöjdspunkten är ändrad till 1,40 m från rotskäret.
+- Gamla standardprofiler som låg på 0,1 / 1,1 / 2,1 ... migreras automatiskt till 0,0 / 1,0 / 2,0 ... när mönstret kan identifieras säkert.

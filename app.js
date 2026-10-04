@@ -19,7 +19,8 @@
     harvestStats: $('#harvestStats'), harvestRows: $('#harvestRows'), harvestEmpty: $('#harvestEmpty'), exportCsv: $('#exportCsv'), finishHarvest: $('#finishHarvest')
   };
 
-  const STORE = 'virkesaptering-state-v4';
+  const STORE = 'virkesaptering-state-v5';
+  const OLD_STORE_V4 = 'virkesaptering-state-v4';
   const OLD_STORE_V3 = 'virkesaptering-state-v3';
   const OLD_STORE_V2 = 'virkesaptering-state-v2';
   const OLD_STORE_V1 = 'virkesaptering-state-v1';
@@ -111,7 +112,7 @@
   function addNextPoint(offsetM) {
     const rows = getPointRows();
     const xs = rows.map(r => Number(r.x)).filter(Number.isFinite);
-    const last = xs.length ? Math.max(...xs) : 0.1;
+    const last = xs.length ? Math.max(...xs) : 0;
     const next = Math.round((last + Number(offsetM)) * 100) / 100;
     const row = pointRow(next.toFixed(next % 1 ? 2 : 1), '');
     row.querySelector('.pd').focus();
@@ -143,7 +144,7 @@
       massavedTransportKm: Number(els.massavedTransport.value) || 0,
       startM: Number(els.startM.value) || 0,
       kerfMm: Number(els.kerfMm.value) || 0,
-      dbhPointM: Number(els.dbhPointM.value) || 1.10,
+      dbhPointM: Number(els.dbhPointM.value) || 1.40,
       latitudeDeg: Number(els.latitudeDeg.value) || 64.25,
       allowUnderDimension: els.allowUnder.checked
     };
@@ -390,9 +391,9 @@
     // Nästa träd börjar med en tom mätprofil. Sista kompletta mätpunkten
     // bestämmer automatiskt det trädets mätta stamlängd.
     els.points.innerHTML = '';
-    pointRow('0.1','');
-    pointRow('1.1','');
-    pointRow('2.1','');
+    pointRow('0.0','');
+    pointRow('1.0','');
+    pointRow('2.0','');
     updatePointCount();
     currentResult = null;
     currentStemSaved = false;
@@ -517,8 +518,12 @@
 
   function loadState() {
     let s=null;
-    let source='v4';
+    let source='v5';
     try { s=JSON.parse(localStorage.getItem(STORE)||'null'); } catch (_) {}
+    if (!s) {
+      source='v4';
+      try { s=JSON.parse(localStorage.getItem(OLD_STORE_V4)||'null'); } catch (_) {}
+    }
     if (!s) {
       source='v3';
       try { s=JSON.parse(localStorage.getItem(OLD_STORE_V3)||'null'); } catch (_) {}
@@ -540,12 +545,22 @@
     els.massavedTransport.value=s.massavedTransport??'0';
     els.startM.value=s.startM??'0';
     els.kerfMm.value=s.kerfMm??'0';
-    els.dbhPointM.value=s.dbhPointM||'1.10';
+    els.dbhPointM.value=(source !== 'v5' && Math.abs(Number(s.dbhPointM) - 1.10) < 0.001) ? '1.40' : (s.dbhPointM||'1.40');
     els.latitudeDeg.value=s.latitudeDeg||'64.25';
     els.allowUnder.checked=!!s.allowUnder;
     els.points.innerHTML='';
-    (s.points||[]).forEach(p=>pointRow(p.x, (source === 'v4' || source === 'v3') ? p.d : (Number(p.d)/10)));
-    if (source !== 'v4') saveState();
+    let storedPoints = Array.isArray(s.points) ? s.points.map(p => ({...p})) : [];
+    // v2.6 migration: old default field positions began at 0.1 m and then continued
+    // at whole metres + 0.1. If the saved profile follows exactly that pattern,
+    // shift it 0.1 m back so the first measurement is at the butt cut (0.0 m).
+    if (source !== 'v5' && storedPoints.length && storedPoints.every(p => {
+      const x = Number(p.x);
+      return Number.isFinite(x) && Math.abs((x - 0.1) - Math.round(x - 0.1)) < 0.0001;
+    })) {
+      storedPoints = storedPoints.map(p => ({...p, x:(Number(p.x) - 0.1).toFixed(1)}));
+    }
+    storedPoints.forEach(p=>pointRow(p.x, (source === 'v5' || source === 'v4' || source === 'v3') ? p.d : (Number(p.d)/10)));
+    if (source !== 'v5') saveState();
     return true;
   }
 
@@ -633,6 +648,7 @@
   function resetAll() {
     if (!confirm('Nollställa ALL lokal data, inklusive alla sparade avverkningar och stammar? Detta går inte att ångra.')) return;
     localStorage.removeItem(STORE);
+    localStorage.removeItem(OLD_STORE_V4);
     localStorage.removeItem(OLD_STORE_V3);
     localStorage.removeItem(OLD_STORE_V2);
     localStorage.removeItem(OLD_STORE_V1);
@@ -665,7 +681,7 @@
   networkStatus();
 
   setQualityOptions(false);
-  if (!loadState()) { els.points.innerHTML=''; pointRow('0.1',''); pointRow('1.1',''); pointRow('2.1',''); updatePointCount(); els.message.textContent = 'Mät första trädet. Lägg till punkter med +1 m, +2 m eller valfritt; sista kompletta mätpunkten blir stamlängden.'; } else updatePointCount();
+  if (!loadState()) { els.points.innerHTML=''; pointRow('0.0',''); pointRow('1.0',''); pointRow('2.0',''); updatePointCount(); els.message.textContent = 'Mät första trädet. Lägg till punkter med +1 m, +2 m eller valfritt; sista kompletta mätpunkten blir stamlängden.'; } else updatePointCount();
   loadHarvestData();
   updateSaveButtons();
 
