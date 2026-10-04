@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#173f2a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Virkesaptering">
+  <meta name="description" content="Offline apteringskalkyl för timmer och massaved enligt Norra Skog NS46-01 i Vindeln.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192">
+  <link rel="stylesheet" href="styles.css">
+  <title>Virkesaptering</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">NORRA SKOG · VINDELN</p>
+        <h1>Virkesaptering</h1>
+        <p class="sub">Mät hela stammen på bark. Appen skiljer på timmer, underdimension och barrmassaved och föreslår kapställen.</p>
+      </div>
+      <div class="status-pill" id="offlineStatus">Offlineklar</div>
+    </header>
+
+    <section class="card compact">
+      <div class="grid2">
+        <label>Träslag
+          <select id="species">
+            <option value="tall">Tall</option>
+            <option value="gran">Gran</option>
+          </select>
+        </label>
+        <label>Timmerkvalitet
+          <select id="quality"></select>
+        </label>
+        <label>Hela stammens längd (m)
+          <input id="stemLength" type="number" inputmode="decimal" min="2.9" max="40" step="0.1" value="18.0">
+        </label>
+        <label>Optimera för
+          <select id="objective">
+            <option value="value">Högsta uppskattade totalvärde</option>
+            <option value="count">Flest normala timmerstockar</option>
+          </select>
+        </label>
+        <label>Massavedskvalitet
+          <select id="massavedQuality">
+            <option value="prima">Prima barrmassaved</option>
+            <option value="sekunda">Sekunda barrmassaved</option>
+          </select>
+        </label>
+        <label>Transportavstånd massaved till mottagande industri (km)
+          <input id="massavedTransport" type="number" inputmode="decimal" min="0" max="1000" step="1" value="0">
+          <small class="field-help">Appen räknar 0,35 kr/m³fub per km, högst 80 kr/m³fub. 0 = baspris före transportavdrag.</small>
+        </label>
+      </div>
+      <details class="advanced">
+        <summary>Avancerat</summary>
+        <div class="grid2 advanced-grid">
+          <label>Start från rotskär (m)
+            <input id="startM" type="number" inputmode="decimal" min="0" max="10" step="0.1" value="0">
+          </label>
+          <label>Sågspår / kapförlust (mm)
+            <input id="kerfMm" type="number" inputmode="numeric" min="0" max="20" step="1" value="0">
+          </label>
+          <label>Brösthöjdspunkt från rotskär (m)
+            <input id="dbhPointM" type="number" inputmode="decimal" min="0.3" max="2" step="0.05" value="1.10">
+          </label>
+          <label>Latitud för tallens barkfunktion
+            <input id="latitudeDeg" type="number" inputmode="decimal" min="55" max="70" step="0.01" value="64.25">
+          </label>
+          <label class="checkrow">
+            <input id="allowUnder" type="checkbox">
+            <span>Tillåt 120–139 mm ub som underdimension timmer (360 kr/m³fub)</span>
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <section class="card assortment-info">
+      <div class="assortment-grid">
+        <div class="assortment-box timber-box">
+          <strong>Timmer</strong>
+          <span>3,40–5,50 m · normalt från 140 mm ub i topp · max 600 mm ub</span>
+        </div>
+        <div class="assortment-box pulp-box">
+          <strong>Barrmassaved</strong>
+          <span>2,90–5,70 m · 50–700 mm ub · prima 410 / sekunda 360 kr/m³fub före transportavdrag</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <h2>Mätpunkter</h2>
+          <p>Avstånd från rotskäret och diameter <strong>utanpå bark</strong>.</p>
+        </div>
+        <span id="pointCount" class="mini-pill">0 punkter</span>
+      </div>
+
+      <div class="toolbar">
+        <button class="secondary" id="grid1" type="button">Var 1 m</button>
+        <button class="secondary" id="grid2" type="button">Var 2 m</button>
+        <button class="secondary" id="addPoint" type="button">+ Punkt</button>
+        <button class="ghost" id="clearDiameters" type="button">Töm diametrar</button>
+      </div>
+
+      <div class="measure-head" aria-hidden="true"><span>Avstånd</span><span>Ø på bark</span><span></span></div>
+      <div id="points" class="measure-list"></div>
+      <p id="measureHint" class="hint">Fyll i minst tre diametrar. Ju fler punkter, desto säkrare stamprofil.</p>
+    </section>
+
+    <section class="card action-card">
+      <button id="calculate" class="primary big" type="button">Aptera hela stammen</button>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="resultSection" class="card result-card hidden" aria-live="polite">
+      <div class="result-main">
+        <div>
+          <p class="eyebrow">RESULTAT</p>
+          <div class="result-counts">
+            <div><span id="stockCount" class="big-number">0</span><small> timmer</small></div>
+            <div><span id="pulpCount" class="big-number pulp-number">0</span><small> massaved</small></div>
+          </div>
+          <p id="resultMode" class="sub"></p>
+        </div>
+        <div class="value-box">
+          <span>Uppskattat totalvärde</span>
+          <strong id="totalValue">0 kr</strong>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div id="warningBox" class="warning hidden"></div>
+    </section>
+
+    <section id="cutPlanSection" class="card hidden">
+      <div class="section-head"><div><h2>Kapplan</h2><p>Kapmått räknat från rotskäret. Grön = timmer, brun = massaved.</p></div></div>
+      <div id="stemBar" class="stem-bar" aria-label="Grafisk kapplan"></div>
+      <div id="cutPlan" class="cut-plan"></div>
+    </section>
+
+    <section id="logTableSection" class="card hidden">
+      <div class="section-head"><div><h2>Sortimentsdetaljer</h2><p>Timmer och barrmassaved redovisas var för sig.</p></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Sortiment</th><th>Från–till</th><th>Längd</th><th>Topp Ø pb</th><th>Topp Ø ub</th><th>Klass/kvalitet</th><th>Pris</th><th>m³fub*</th><th>Värde*</th></tr></thead>
+          <tbody id="logRows"></tbody>
+        </table>
+      </div>
+      <p class="footnote">* Volym och värde är fältuppskattningar, inte ersättningsgrundande inmätning. Massavedspris påverkas av transportavståndet du anger; appen räknar avdraget enligt prislistans formel.</p>
+    </section>
+
+    <section class="card notes">
+      <h2>Om beräkningen</h2>
+      <ul>
+        <li>Prislistan är Norra Skog NS46-01 för Vindeln, giltig från 2026-04-20.</li>
+        <li>Normalt timmer räknas från 140 mm toppdiameter under bark. 120–139 mm kan valfritt räknas som underdimension.</li>
+        <li>Barrmassaved räknas med prislistans dimensioner 2,90–5,70 m, 50–700 mm ub.</li>
+        <li>Massaved planeras i 10 cm steg i appen för att ge praktiska kapmått.</li>
+        <li>Massavedens baspris är 410 kr/m³fub prima och 360 kr/m³fub sekunda. Transportavdrag räknas som 0,35 kr/m³fub per km, högst 80 kr/m³fub.</li>
+        <li>Tall och gran får enligt prislistan samsorteras i barrmassaved. Appen håller ändå reda på valt träslag för barkberäkningen.</li>
+        <li>Barkavdrag skattas med Skogforsks barkfunktioner för tall och gran.</li>
+        <li>Krök, röta, kvist, sprötkvist, skador och andra kvalitetsfel kan inte avgöras från diametermätning och bedöms därför inte automatiskt.</li>
+      </ul>
+    </section>
+
+    <section class="card install-card" id="installCard">
+      <h2>Installera på iPhone</h2>
+      <p>När appen ligger på en HTTPS-adress: öppna den i Safari → <strong>Dela</strong> → <strong>Lägg till på hemskärmen</strong> → aktivera <strong>Öppna som webbapp</strong>.</p>
+    </section>
+
+    <footer>
+      <span>Virkesaptering v2.1 · NS46-01</span>
+      <button id="resetAll" type="button" class="link-button">Nollställ sparade data</button>
+    </footer>
+  </main>
+
+  <script src="logic.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
